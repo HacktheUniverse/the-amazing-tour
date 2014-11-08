@@ -1,18 +1,9 @@
 #!/usr/bin/python
 
 import math
-from graphics import *
 from visual import sphere
 from visual import display
 import time
-win = GraphWin('Stars', 1000, 1000)
-pt = Point(500, 500)
-pt.draw(win)
-cir = Circle(pt, 500)
-cir.setOutline('white')
-aColor = color_rgb(255, 0, 0)
-# cir.setFill(aColor)
-cir.draw(win)
 
 def bv_to_rgb(bv):
 	bv = float(bv)
@@ -44,47 +35,18 @@ def bv_to_rgb(bv):
 	X = 0 if (y == 0) else (x * Y) / y
 	Z = 0 if (y == 0) else ((1 - x - y) * Y) / y
 
-
-	# r = 0.41847 * X1 - 0.15866 * Y1 - 0.082835 * Z1
-	# g = -0.091169 * X1 + 0.25243 * Y1 + 0.015708 * Z1
-	# b = 0.00092090 * X1 - 0.0025498 * Y1 + 0.17860 * Z1
-
 	r = 3.2406 * X - 1.5372 * Y - 0.4986 * Z
 	g = -0.9689 * X + 1.8758 * Y + 0.0415 * Z
 	b = 0.0557 * X - 0.2040 * Y + 1.0570 * Z
 
-	if (r <= 0.0031308):
-		R = 12.92*r
-	else:
-		R =  1.055*math.pow(r,1/0.5)-0.055
+	R = 12.92*r if (r <= 0.0031308) else 1.055*math.pow(r,1/0.5)-0.055
+	G = 12.92*g if (g <= 0.0031308) else 1.055*math.pow(g,1/0.5)-0.055
+	B = 12.92*b if (b <= 0.0031308) else 1.055*math.pow(b,1/0.5)-0.055
 
-	if (g <= 0.0031308):
-		G = 12.92*g
-	else:
-		G =  1.055*math.pow(g,1/0.5)-0.055
-
-	if (b <= 0.0031308):
-		B = 12.92*b
-	else:
-		B =  1.055*math.pow(b,1/0.5)-0.055
-
-	NR = 255 if (R*255 > 255) else R*255
-	NG = 255 if (G*255 > 255) else G*255
-	NB = 255 if (B*255 > 255) else B*255
-
-	print str(NR) + " " + str(NG) + " " + str(NB)
-
-	aColor = color_rgb(NR, NG, NB)
-	cir.setFill(aColor)
-	cir.setOutline(aColor)
-	# cir.draw(win)
-	color = (NR+NG+NB)/3
-	print("\033[38;5;" + str(int(color)) + "m" + str(math.floor(color)) + "\033[0;00m")
-	time.sleep(.01)
 	return [R,G,B]
 
 scene = display()
-# scene.stereo='redblue'
+# scene.stereo='crosseyed'
 
 stars_speck = open('stars.speck', 'r')
 for x in xrange(1,29):
@@ -94,19 +56,18 @@ output = open('xyzrgblum.txt', 'w')
 for i in xrange(1,2000):
 	line = stars_speck.readline()
 	data = line.split()
-	cir.undraw()
-	cir = Circle(pt, float(data[4]))
-	cir.draw(win)
 	rgb = bv_to_rgb(data[3])
 	if rgb[0] == -1:
 		continue
 	newsphere = sphere()
 	newsphere.pos = (float(data[0]), float(data[1]), float(data[2]))
 	newsphere.color = rgb
-	newsphere.radius = float(data[4])/100.0
+	absolute_mag = float(data[5])
+	newsphere.radius = float(data[4])/500.0
 	spheres.append(newsphere)
 
 	string = str(data[0]) + "," + str(data[1]) + "," + str(data[2]) + "," + str(rgb[0]) + "," + str(rgb[1]) + "," + str(rgb[2]) + "," + data[4] + "," + data[3] + "," + data[18] 
 	output.write(string)
 
 	output.write("\n")
+	print str(i) + "\n"
