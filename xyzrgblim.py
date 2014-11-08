@@ -1,6 +1,18 @@
 #!/usr/bin/python
 
 import math
+from graphics import *
+from visual import sphere
+from visual import display
+import time
+win = GraphWin('Stars', 1000, 1000)
+pt = Point(500, 500)
+pt.draw(win)
+cir = Circle(pt, 500)
+cir.setOutline('white')
+aColor = color_rgb(255, 0, 0)
+# cir.setFill(aColor)
+cir.draw(win)
 
 def bv_to_rgb(bv):
 	bv = float(bv)
@@ -28,9 +40,9 @@ def bv_to_rgb(bv):
 		return [-1]
 
 	# xyY to XYZ, Y = 1
-	Y = (y == 0) if 0 else 1
-	X = (y == 0) if 0 else (x * Y) / y
-	Z = (y == 0) if 0 else ((1 - x - y) * Y) / y
+	Y = 0 if (y == 0) else 1
+	X = 0 if (y == 0) else (x * Y) / y
+	Z = 0 if (y == 0) else ((1 - x - y) * Y) / y
 
 
 	# r = 0.41847 * X1 - 0.15866 * Y1 - 0.082835 * Z1
@@ -56,24 +68,44 @@ def bv_to_rgb(bv):
 	else:
 		B =  1.055*math.pow(b,1/0.5)-0.055
 
-	color = (R*255+G*255+B*255)/3 * 255/400
+	NR = 255 if (R*255 > 255) else R*255
+	NG = 255 if (G*255 > 255) else G*255
+	NB = 255 if (B*255 > 255) else B*255
+
+	print str(NR) + " " + str(NG) + " " + str(NB)
+
+	aColor = color_rgb(NR, NG, NB)
+	cir.setFill(aColor)
+	cir.setOutline(aColor)
+	# cir.draw(win)
+	color = (NR+NG+NB)/3
 	print("\033[38;5;" + str(int(color)) + "m" + str(math.floor(color)) + "\033[0;00m")
-	# echo -e "\033[38;5;208mpeach\033[0;00m"
+	time.sleep(.01)
 	return [R,G,B]
 
-
-
+scene = display()
+# scene.stereo='redblue'
 
 stars_speck = open('stars.speck', 'r')
 for x in xrange(1,29):
 	stars_speck.readline()
-
+spheres = []
 output = open('xyzrgblum.txt', 'w')
-for line in stars_speck:
+for i in xrange(1,2000):
+	line = stars_speck.readline()
 	data = line.split()
+	cir.undraw()
+	cir = Circle(pt, float(data[4]))
+	cir.draw(win)
 	rgb = bv_to_rgb(data[3])
 	if rgb[0] == -1:
 		continue
+	newsphere = sphere()
+	newsphere.pos = (float(data[0]), float(data[1]), float(data[2]))
+	newsphere.color = rgb
+	newsphere.radius = float(data[4])/100.0
+	spheres.append(newsphere)
+
 	string = str(data[0]) + "," + str(data[1]) + "," + str(data[2]) + "," + str(rgb[0]) + "," + str(rgb[1]) + "," + str(rgb[2]) + "," + data[4] + "," + data[3] + "," + data[18] 
 	output.write(string)
 
