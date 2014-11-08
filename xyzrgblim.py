@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import math
-from visual import sphere
-from visual import display
+from visual import *
+# from visual import display
 import time
 
 def bv_to_rgb(bv):
@@ -45,29 +45,55 @@ def bv_to_rgb(bv):
 
 	return [R,G,B]
 
-scene = display()
+# scene = display()
 # scene.stereo='crosseyed'
-
+# scene.stereodepth = 2
+# scene.scale = (10,10,10)
+# pointerx = arrow(pos=(0,0,0), axis=(500,0,0), shaftwidth=1)
+# pointerx.color = (255,0,0)
+# pointery = arrow(pos=(0,0,0), axis=(0,500,0), shaftwidth=1)
+# pointery.color = (0,255,0)
+# pointerz = arrow(pos=(0,0,0), axis=(0,0,500), shaftwidth=1)
+# pointerz.color = (0,0,255)
 stars_speck = open('stars.speck', 'r')
 for x in xrange(1,29):
 	stars_speck.readline()
-spheres = []
+
 output = open('xyzrgblum.txt', 'w')
-for i in xrange(1,2000):
+number_of_stars=3500
+for i in range(1,number_of_stars):
 	line = stars_speck.readline()
 	data = line.split()
 	rgb = bv_to_rgb(data[3])
 	if rgb[0] == -1:
 		continue
-	newsphere = sphere()
-	newsphere.pos = (float(data[0]), float(data[1]), float(data[2]))
-	newsphere.color = rgb
-	absolute_mag = float(data[5])
-	newsphere.radius = float(data[4])/500.0
-	spheres.append(newsphere)
+	if float(data[4]) > 100.0 or i == 1:
+		# print str(data[4]) + " MAKING SPHERE!"
+		newsphere = sphere()
+		newsphere.pos = (float(data[0]), float(data[1]), float(data[2]))
+		newsphere.color = rgb
+		# newsphere.opacity = 0.5
+		absolute_mag = float(data[5])
+		newsphere.radius = math.log(float(data[4]))/1.5
+	else:
+		# print str(data[4]) + " NOT MAKING SPHERE!"
+		newsphere = points()
+		newsphere.pos = (float(data[0]), float(data[1]), float(data[2]))
+		newsphere.color = rgb
+		# newsphere.opacity = 0.5
+		absolute_mag = float(data[5])
+		newsphere.size = math.log(float(data[4]))
 
 	string = str(data[0]) + "," + str(data[1]) + "," + str(data[2]) + "," + str(rgb[0]) + "," + str(rgb[1]) + "," + str(rgb[2]) + "," + data[4] + "," + data[3] + "," + data[18] 
 	output.write(string)
 
 	output.write("\n")
-	print str(i) + "\n"
+	#skip a bunch of lines to get a more evenly spaced data set
+	for x in xrange(1,100000/number_of_stars):
+		stars_speck.readline()
+
+scene.forward = (1,1,0)
+
+# while 1:
+# 	scene.forward = scene.forward.rotate(math.pi/180)
+# 	time.sleep(.2)
