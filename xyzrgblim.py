@@ -84,7 +84,7 @@ for line in stars_speck:
 	rgb = bv_to_rgb(data[3])
 	if rgb[0] == -1:
 		continue
-	string = str(data[0]) + "," + str(data[1]) + "," + str(data[2]) + "," + str(rgb[0]) + "," + str(rgb[1]) + "," + str(rgb[2]) + "," + data[4] + 
+	string = str(data[0]) + "," + str(data[1]) + "," + str(data[2]) + "," + str(rgb[0]) + "," + str(rgb[1]) + "," + str(rgb[2]) + "," + data[4] + "," + data[3] + "," + data[18] 
 	output.write(string)
 
 	output.write("\n")
