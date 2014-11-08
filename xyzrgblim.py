@@ -5,7 +5,6 @@ import math
 def bv_to_rgb(bv):
 	bv = float(bv)
 	t = 4600.0 * ((1.0 / ((0.92 * bv) + 1.7)) +(1.0 / ((0.92 * bv) + 0.62)) )
-	print t
 	rcode = 0
 
 	if t>=1667 and t<=4000:
@@ -33,9 +32,6 @@ def bv_to_rgb(bv):
 	X = (y == 0) if 0 else (x * Y) / y
 	Z = (y == 0) if 0 else ((1 - x - y) * Y) / y
 
-	print Y
-	print X
-	print Z
 
 	# r = 0.41847 * X1 - 0.15866 * Y1 - 0.082835 * Z1
 	# g = -0.091169 * X1 + 0.25243 * Y1 + 0.015708 * Z1
@@ -44,11 +40,6 @@ def bv_to_rgb(bv):
 	r = 3.2406 * X - 1.5372 * Y - 0.4986 * Z
 	g = -0.9689 * X + 1.8758 * Y + 0.0415 * Z
 	b = 0.0557 * X - 0.2040 * Y + 1.0570 * Z
-
-	print r
-	print g
-	print b
-
 
 	if (r <= 0.0031308):
 		R = 12.92*r
@@ -65,10 +56,12 @@ def bv_to_rgb(bv):
 	else:
 		B =  1.055*math.pow(b,1/0.5)-0.055
 
-	print R
-	print G
-	print B
+	color = (R*255+G*255+B*255)/3 * 255/400
+	print("\033[38;5;" + str(int(color)) + "m" + str(math.floor(color)) + "\033[0;00m")
+	# echo -e "\033[38;5;208mpeach\033[0;00m"
 	return [R,G,B]
+
+
 
 
 stars_speck = open('stars.speck', 'r')
@@ -77,10 +70,7 @@ for x in xrange(1,29):
 
 output = open('xyzrgblum.txt', 'w')
 for line in stars_speck:
-	print line
 	data = line.split()
-	for value in data:
-		pass
 	rgb = bv_to_rgb(data[3])
 	if rgb[0] == -1:
 		continue
